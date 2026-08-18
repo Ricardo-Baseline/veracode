@@ -85,7 +85,7 @@ jobs:
       - name: Validate Baseline File
         id: validate-baseline-file
         run: |
-          files=$(ls | jq -R . | jq -s .)
+          files=$(ls -ap | jq -R . | jq -s .)
           echo "Files available: $files"
         shell: bash
 
