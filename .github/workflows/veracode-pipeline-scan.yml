@@ -115,16 +115,16 @@ jobs:
           ls ./
           
           echo "Up 2:"
-          ls ././
+          ls ./../
           
           echo "Up 3:"
-          ls ./././
+          ls ./../../
           
           echo "Up 4:"
-          ls ././././
+          ls ./../../../
           
           echo "Up 5:"
-          ls ./././././
+          ls ./../../../../
           baseline_file="./pipeline_scan_baselines/${{ inputs.profile_name }}/${{ matrix.file }}_baseline.json"
           echo "Looking for baseline file at: $baseline_file"
           if [ ! -f $baseline_file ]; then
