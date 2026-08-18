@@ -91,8 +91,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        name: Download scanned repository
         with:
           repository: ${{ inputs.owner }}/${{ inputs.repo }}
+          ref: ${{ inputs.ref }}
+          token: ${{ inputs.token }}
+          
+      - uses: actions/checkout@v6
+        name: Download pipeline baselines
+        with:
+          repository: ${{ inputs.owner }}/veracode-baselines
           ref: ${{ inputs.ref }}
           token: ${{ inputs.token }}
 
@@ -111,14 +119,8 @@ jobs:
       - name: Validate Baseline File
         id: find-baseline-file
         run: |
-          echo "------------------------"
-          echo "Up 2 Veracode Folder:"
-          ls -lR ./../veracode 
-          echo "------------------------"
-          echo "Up 3 Veracode Folder:"
-          ls -lR ./../../veracode
-          
-          baseline_file="./pipeline_scan_baselines/${{ inputs.profile_name }}/${{ matrix.file }}_baseline.json"
+          ls $GITHUB_WORKSPACE
+          baseline_file="$GITHUB_WORKSPACE/veracode_baselines/${{ inputs.profile_name }}/${{ matrix.file }}_baseline.json"
           echo "Looking for baseline file at: $baseline_file"
           if [ ! -f $baseline_file ]; then
               echo "Baseline file not found!"
