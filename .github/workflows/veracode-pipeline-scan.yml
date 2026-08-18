@@ -82,13 +82,6 @@ jobs:
           echo "matrix_files=$files" >> $GITHUB_OUTPUT
         shell: bash
 
-      - name: Validate Baseline File
-        id: validate-baseline-file
-        run: |
-          files=$(ls -ap | jq -R . | jq -s .)
-          echo "Files available: $files"
-        shell: bash
-
   pipeline_scan:
     runs-on: ${{ fromJson(inputs.default_runs_on) }}
     needs: prepare_pipeline_scan
@@ -108,13 +101,28 @@ jobs:
         with:
           name: veracode-artifact
           path: ./veracode_artifact_directory
+          
       - name: Debug Matrix Content
         run: |
           echo "Raw matrix files: ${{ needs.prepare_pipeline_scan.outputs.matrix_files }}"
           echo "Current Matrix: ${{ matrix }}"
           echo "Current File: ${{ matrix.file }}"
+          
+      - name: Validate Baseline File
+        id: find-baseline-file
+        run: |
+          baseline_file="pipeline_scan_baselines/${{ inputs.profile_name }}/${{ matrix.file }}_baseline.json"
+          echo "Looking for baseline file at: $baseline_file"
+          if [ ! -f $baseline_file ]; then
+              echo "Baseline file not found!"
+              baseline_file=""
+          else
+              echo "Baseline file found!"
+          fi
+        shell: bash
 
       - name: Veracode Pipeline-Scan
+        #needs: find-baseline-file
         if: always()
         id: pipeline-scan
         uses: veracode/Veracode-pipeline-scan-action@v1.0.23
@@ -131,6 +139,7 @@ jobs:
           filtered_json_output_file: ${{ strategy.job-index }}-filtered_results.json
           artifact_name: ${{ matrix.file }}
           debug: ${{ inputs.debug == true && '1' || '0' }}
+          baseline_file: ${{ steps.find-baseline-file.outputs.baseline_file || '' }}
           workflow_app: true
     
       - name: Veracode Pipeline Results
