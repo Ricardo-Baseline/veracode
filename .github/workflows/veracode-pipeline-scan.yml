@@ -111,7 +111,20 @@ jobs:
       - name: Validate Baseline File
         id: find-baseline-file
         run: |
-          ls -lR
+          echo "Up 1:"
+          ls ./
+          
+          echo "Up 2:"
+          ls ././
+          
+          echo "Up 3:"
+          ls ./././
+          
+          echo "Up 4:"
+          ls ././././
+          
+          echo "Up 5:"
+          ls ./././././
           baseline_file="./pipeline_scan_baselines/${{ inputs.profile_name }}/${{ matrix.file }}_baseline.json"
           echo "Looking for baseline file at: $baseline_file"
           if [ ! -f $baseline_file ]; then
