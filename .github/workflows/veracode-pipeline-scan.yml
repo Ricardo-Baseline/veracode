@@ -120,7 +120,7 @@ jobs:
         id: find-baseline-file
         run: |
           ls $GITHUB_WORKSPACE
-          baseline_file="$GITHUB_WORKSPACE/veracode_baselines/${{ inputs.profile_name }}/${{ matrix.file }}_baseline.json"
+          baseline_file="$GITHUB_WORKSPACE/veracode_baselines/pipeline_scan_baselines/${{ inputs.profile_name }}/${{ matrix.file }}_baseline.json"
           echo "Looking for baseline file at: $baseline_file"
           if [ ! -f $baseline_file ]; then
               echo "Baseline file not found!"
