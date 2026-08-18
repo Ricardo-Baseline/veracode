@@ -100,8 +100,8 @@ jobs:
       - uses: actions/checkout@v6
         name: Download pipeline baselines
         with:
-          repository: ${{ inputs.owner }}/veracode
-          token: ${{ inputs.token }}
+          repository: ${{ inputs.owner }}/veracode-baselines
+          token: ${{ secrets.VERACODE_BASELINES_PAT }}
           clean: 'false'
 
       - name: get archive
