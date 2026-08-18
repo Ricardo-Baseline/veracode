@@ -82,6 +82,13 @@ jobs:
           echo "matrix_files=$files" >> $GITHUB_OUTPUT
         shell: bash
 
+      - name: Validate Baseline File
+        id: validate-baseline-file
+        run: |
+          files=$(ls | jq -R . | jq -s .)
+          echo "Files available: $files"
+        shell: bash
+
   pipeline_scan:
     runs-on: ${{ fromJson(inputs.default_runs_on) }}
     needs: prepare_pipeline_scan
