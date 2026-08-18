@@ -111,20 +111,13 @@ jobs:
       - name: Validate Baseline File
         id: find-baseline-file
         run: |
-          echo "Up 1:"
-          ls ./
+          echo "------------------------"
+          echo "Up 2 Veracode Folder:"
+          ls -lR ./../veracode 
+          echo "------------------------"
+          echo "Up 3 Veracode Folder:"
+          ls -lR ./../../veracode
           
-          echo "Up 2:"
-          ls ./../
-          
-          echo "Up 3:"
-          ls ./../../
-          
-          echo "Up 4:"
-          ls ./../../../
-          
-          echo "Up 5:"
-          ls ./../../../../
           baseline_file="./pipeline_scan_baselines/${{ inputs.profile_name }}/${{ matrix.file }}_baseline.json"
           echo "Looking for baseline file at: $baseline_file"
           if [ ! -f $baseline_file ]; then
