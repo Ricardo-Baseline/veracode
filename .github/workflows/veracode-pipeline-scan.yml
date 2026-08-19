@@ -121,13 +121,15 @@ jobs:
         run: |
           ls -lR ./pipeline_scan_baselines
           baseline_file="./pipeline_scan_baselines/${{ inputs.profile_name }}/${{ matrix.file }}_baseline.json"
-          echo "Looking for baseline file at: $baseline_file"
+          echo "Looking for baseline file at $baseline_file"
           if [ -f $baseline_file ]; then
-            echo "Baseline file found!"
+            echo "Baseline file found at $baseline_file"
           else
               echo "Baseline file not found!"
               baseline_file=""
           fi
+          
+          echo "baseline_to_use=$baseline_file" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Veracode Pipeline-Scan
@@ -147,7 +149,7 @@ jobs:
           filtered_json_output_file: ${{ strategy.job-index }}-filtered_results.json
           artifact_name: ${{ matrix.file }}
           debug: ${{ inputs.debug == true && '1' || '0' }}
-          baseline_file: ${{ steps.find-baseline-file.outputs.baseline_file || '' }}
+          baseline_file: ${{ steps.find-baseline-file.outputs.baseline_to_use }}
           workflow_app: true
     
       - name: Veracode Pipeline Results
