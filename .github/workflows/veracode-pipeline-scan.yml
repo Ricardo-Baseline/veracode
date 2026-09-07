@@ -1,5 +1,5 @@
 name: Veracode Static Pipeline Scanner
-#Sets concurrency to use GitHub run number's last digit (creating 10 groups)
+# Sets concurrency to use GitHub run number's last digit (creating 10 groups)
 concurrency:
   group: veracode-scan-${{ case(endsWith( github.run_number, '0'), '0', endsWith( github.run_number, '1'), '1', endsWith( github.run_number, '2'), '2', endsWith( github.run_number, '3'), '3', endsWith( github.run_number, '4'), '4', endsWith( github.run_number, '5'), '5', endsWith( github.run_number, '6'), '6', endsWith( github.run_number, '7'), '7', endsWith( github.run_number, '8'), '8', endsWith( github.run_number, '9'), '9', '0') }}
   cancel-in-progress: false
@@ -92,6 +92,8 @@ jobs:
     strategy:
       matrix:
         file: ${{fromJson(needs.prepare_pipeline_scan.outputs.matrix_files)}}
+      # limiting for 6 to run in parallel due to pipeline scan limits
+      max-parallel: 6
 
     steps:
       - uses: actions/checkout@v6
