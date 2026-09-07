@@ -1,5 +1,8 @@
 name: Veracode Static Pipeline Scanner
-
+concurrency:
+  group: veracode-scan-${{ case(endsWith( github.run_id, '0'), '0', endsWith( github.run_id, '1'), '1', endsWith( github.run_id, '2'), '2', endsWith( github.run_id, '3'), '3', endsWith( github.run_id, '4'), '4', endsWith( github.run_id, '5'), '5', endsWith( github.run_id, '6'), '6', endsWith( github.run_id, '7'), '7', endsWith( github.run_id, '8'), '8', endsWith( github.run_id, '9'), '9', '0') }}
+  cancel-in-progress: false
+  queue: max
 on:
   workflow_call:
     inputs:
@@ -60,7 +63,9 @@ jobs:
     runs-on: ${{ fromJson(inputs.default_runs_on) }}
     name: prepare pipeline scan
     outputs:
-      matrix_files: ${{ steps.get-files.outputs.matrix_files }} 
+      matrix_files: ${{ steps.get-files.outputs.matrix_files }}
+      pipeline_scan_api_id_to_use: ${{ steps.get-credentials.outputs.pipeline_scan_api_id }}
+      pipeline_scan_api_key_to_use: ${{ steps.get-credentials.outputs.pipeline_scan_api_key }}
 
     steps:
       - name: checkout repo
@@ -80,6 +85,63 @@ jobs:
           echo "Files for matrix: $files"
           files=$(echo $files | jq -c .)  # Compact the JSON array to a single line
           echo "matrix_files=$files" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Get list of files for matrix
+        id: get-credentials
+        run: |
+          echo "Fetching API credentials to use:"
+          echo "GitHub Run ID: ${{ github.run_id }}"
+          if [["${{ github.run_id }}" == *0]]
+          then
+          	 echo "Using API Credentials on VERACODE_API_ID_0/VERACODE_API_KEY_0"
+             echo "pipeline_scan_api_id=${{ secrets.VERACODE_API_ID_0 }}" >> $GITHUB_OUTPUT
+             echo "pipeline_scan_api_key=${{ secrets.VERACODE_API_KEY_0 }}" >> $GITHUB_OUTPUT
+          elif [["${{ github.run_id }}" == *1]]
+          then
+          	echo "Using API Credentials on VERACODE_API_ID_1/VERACODE_API_KEY_1"
+            echo "pipeline_scan_api_id=${{ secrets.VERACODE_API_ID_1 }}" >> $GITHUB_OUTPUT
+            echo "pipeline_scan_api_key=${{ secrets.VERACODE_API_KEY_1 }}" >> $GITHUB_OUTPUT
+          elif [["${{ github.run_id }}" == *2]]
+          then
+          	echo "Using API Credentials on VERACODE_API_ID_2/VERACODE_API_KEY_2"
+            echo "pipeline_scan_api_id=${{ secrets.VERACODE_API_ID_2 }}" >> $GITHUB_OUTPUT
+            echo "pipeline_scan_api_key=${{ secrets.VERACODE_API_KEY_2 }}" >> $GITHUB_OUTPUT
+          elif [["${{ github.run_id }}" == *3]]
+          then
+          	echo "Using API Credentials on VERACODE_API_ID_3/VERACODE_API_KEY_3"
+            echo "pipeline_scan_api_id=${{ secrets.VERACODE_API_ID_3 }}" >> $GITHUB_OUTPUT
+            echo "pipeline_scan_api_key=${{ secrets.VERACODE_API_KEY_3 }}" >> $GITHUB_OUTPUT
+          elif [["${{ github.run_id }}" == *4]]
+          then
+          	echo "Using API Credentials on VERACODE_API_ID_4/VERACODE_API_KEY_4"
+            echo "pipeline_scan_api_id=${{ secrets.VERACODE_API_ID_4 }}" >> $GITHUB_OUTPUT
+            echo "pipeline_scan_api_key=${{ secrets.VERACODE_API_KEY_4 }}" >> $GITHUB_OUTPUT
+          elif [["${{ github.run_id }}" == *5]]
+          then
+          	echo "Using API Credentials on VERACODE_API_ID_5/VERACODE_API_KEY_5"
+            echo "pipeline_scan_api_id=${{ secrets.VERACODE_API_ID_5 }}" >> $GITHUB_OUTPUT
+            echo "pipeline_scan_api_key=${{ secrets.VERACODE_API_KEY_5 }}" >> $GITHUB_OUTPUT
+          elif [["${{ github.run_id }}" == *6]]
+          then
+          	echo "Using API Credentials on VERACODE_API_ID_6/VERACODE_API_KEY_6"
+            echo "pipeline_scan_api_id=${{ secrets.VERACODE_API_ID_6 }}" >> $GITHUB_OUTPUT
+            echo "pipeline_scan_api_key=${{ secrets.VERACODE_API_KEY_6 }}" >> $GITHUB_OUTPUT
+          elif [["${{ github.run_id }}" == *7]]
+          then
+          	echo "Using API Credentials on VERACODE_API_ID_7/VERACODE_API_KEY_7"
+            echo "pipeline_scan_api_id=${{ secrets.VERACODE_API_ID_7 }}" >> $GITHUB_OUTPUT
+            echo "pipeline_scan_api_key=${{ secrets.VERACODE_API_KEY_7 }}" >> $GITHUB_OUTPUT
+          elif [["${{ github.run_id }}" == *8]]
+          then
+          	echo "Using API Credentials on VERACODE_API_ID_8/VERACODE_API_KEY_8"
+            echo "pipeline_scan_api_id=${{ secrets.VERACODE_API_ID_8 }}" >> $GITHUB_OUTPUT
+            echo "pipeline_scan_api_key=${{ secrets.VERACODE_API_KEY_8 }}" >> $GITHUB_OUTPUT
+          else
+          	echo "Using API Credentials on VERACODE_API_ID_9/VERACODE_API_KEY_9"
+            echo "pipeline_scan_api_id=${{ secrets.VERACODE_API_ID_9 }}" >> $GITHUB_OUTPUT
+            echo "pipeline_scan_api_key=${{ secrets.VERACODE_API_KEY_9 }}" >> $GITHUB_OUTPUT
+          fi
         shell: bash
 
   pipeline_scan:
@@ -136,8 +198,8 @@ jobs:
         id: pipeline-scan
         uses: veracode/Veracode-pipeline-scan-action@v1.0.23
         with:
-          vid: ${{ secrets.VERACODE_API_ID }}
-          vkey: ${{ secrets.VERACODE_API_KEY }}
+          vid: ${{ needs.prepare_pipeline_scan.outputs.pipeline_scan_api_id_to_use }}
+          vkey: ${{ needs.prepare_pipeline_scan.outputs.pipeline_scan_api_key_to_use}}
           veracode_policy_name: ${{ inputs.policy_name }}
           file: ./veracode_artifact_directory/${{ matrix.file }}
           fail_build: ${{ inputs.break_build_policy_findings }}
