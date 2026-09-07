@@ -1,4 +1,5 @@
 name: Veracode Static Pipeline Scanner
+#Sets concurrency to use GitHub run number's last digit (creating 10 groups)
 concurrency:
   group: veracode-scan-${{ case(endsWith( github.run_number, '0'), '0', endsWith( github.run_number, '1'), '1', endsWith( github.run_number, '2'), '2', endsWith( github.run_number, '3'), '3', endsWith( github.run_number, '4'), '4', endsWith( github.run_number, '5'), '5', endsWith( github.run_number, '6'), '6', endsWith( github.run_number, '7'), '7', endsWith( github.run_number, '8'), '8', endsWith( github.run_number, '9'), '9', '0') }}
   cancel-in-progress: false
@@ -64,6 +65,7 @@ jobs:
     name: prepare pipeline scan
     outputs:
       matrix_files: ${{ steps.get-files.outputs.matrix_files }}
+      # API credentials need to be available for the pipeline scan step
       pipeline_scan_api_id_to_use: ${{ steps.get-credentials.outputs.pipeline_scan_api_id }}
       pipeline_scan_api_key_to_use: ${{ steps.get-credentials.outputs.pipeline_scan_api_key }}
 
@@ -87,11 +89,12 @@ jobs:
           echo "matrix_files=$files" >> $GITHUB_OUTPUT
         shell: bash
 
+      # API credentials are selected based on run number
       - name: Get credentials to use for pipeline scans
         id: get-credentials
         run: |
           echo "Fetching API credentials to use:"
-          echo "GitHub Run ID: ${{ github.run_number }}"
+          echo "GitHub Run Number: ${{ github.run_number }}"
           if [[ "${{ github.run_number }}" == *0 ]]
           then
             echo "Using API Credentials on VERACODE_API_ID_0/VERACODE_API_KEY_0"
@@ -199,6 +202,7 @@ jobs:
         id: pipeline-scan
         uses: veracode/Veracode-pipeline-scan-action@v1.0.23
         with:
+          # Using the credentials based on run number instead of default credentials
           vid: ${{ needs.prepare_pipeline_scan.outputs.pipeline_scan_api_id_to_use }}
           vkey: ${{ needs.prepare_pipeline_scan.outputs.pipeline_scan_api_key_to_use}}
           veracode_policy_name: ${{ inputs.policy_name }}
