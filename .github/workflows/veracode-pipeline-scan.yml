@@ -102,7 +102,8 @@ jobs:
           repository: ${{ inputs.owner }}/${{ inputs.repo }}
           ref: ${{ inputs.ref }}
           token: ${{ inputs.token }}
-          
+
+      # BASELINE: downloads the baseline from the baselines repo
       - uses: actions/checkout@v6
         name: Download pipeline baselines
         with:
@@ -121,7 +122,8 @@ jobs:
           echo "Raw matrix files: ${{ needs.prepare_pipeline_scan.outputs.matrix_files }}"
           echo "Current Matrix: ${{ matrix }}"
           echo "Current File: ${{ matrix.file }}"
-          
+
+      # BASELINE: checks if baseline file exists
       - name: Validate Baseline File
         id: find-baseline-file
         run: |
@@ -155,6 +157,7 @@ jobs:
           filtered_json_output_file: ${{ strategy.job-index }}-filtered_results.json
           artifact_name: ${{ matrix.file }}
           debug: ${{ inputs.debug == true && '1' || '0' }}
+          # BASELINE: referencing the baseline file on the pipeline scan
           baseline_file: ${{ steps.find-baseline-file.outputs.baseline_to_use }}
           workflow_app: true
     
