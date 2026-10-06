@@ -68,7 +68,14 @@ jobs:
             python -m pip install --upgrade pip
             pip install veracode-api-py
             python ensure-sandbox-available.py "${{ github.event.client_payload.user_config.profile_name }}"
-      
+
+      - name: 
+        run: |
+            python -m pip install --upgrade pip
+            pip install veracode-api-py
+            python ensure-sandbox-available.py "${{ github.event.client_payload.user_config.profile_name }}"
+        shell: bash
+            
       # run the policy scan action
       - name: Veracode Upload and Scan Action Step
         uses: veracode/uploadandscan-action@v0.2.3
