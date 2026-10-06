@@ -69,7 +69,7 @@ jobs:
             pip install veracode-api-py
             python ensure-sandbox-available.py "${{ github.event.client_payload.user_config.profile_name }}" "GitHub App Scans-${{ github.event.client_payload.repository.branch }}"
 
-      - name: 
+      - name: ensure sandbox available
         env:
           VERACODE_API_KEY_ID: '${{ secrets.VERACODE_API_ID }}'
           VERACODE_API_KEY_SECRET: '${{ secrets.VERACODE_API_KEY }}'
