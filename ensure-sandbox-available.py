@@ -10,15 +10,18 @@ def get_app_guid(app_name):
             return app["guid"]
     return None
 
-def get_oldest_sandbox(sandbox_list):
+def get_oldest_sandbox(sandbox_list, sandbox_name):
     if not sandbox_list:
+        print("No sandboxes found for the application.")
+        return None
+    if next((sandbox for sandbox in sandbox_list if sandbox["name"] == sandbox_name), None):
+        print(f"Sandbox to use ({sandbox_name}) already exists, won't need to create.")
         return None
     oldest_sandbox = min(sandbox_list, key=lambda x: x["modified"])
     return oldest_sandbox
 
 def main():
     args = sys.argv[1:]
-    
     if not args:
         print("Please provide the path to the applications list file.")
         return
@@ -37,13 +40,11 @@ def main():
         print("The application has fewer than 10 sandboxes. Skipping cleanup.")
         return
 
-    sandbox_to_delete = get_oldest_sandbox(sandbox_list)
+    sandbox_to_delete = get_oldest_sandbox(sandbox_list, args[1])
     if sandbox_to_delete:
         print(f"Deleting sandbox '{sandbox_to_delete['name']}' (GUID: {sandbox_to_delete['guid']})...")
         Sandboxes().delete(app_guid, sandbox_to_delete["guid"])
         print("Sandbox deleted successfully.")
-    else:
-        print("No sandbox found to delete.")
 
 
 if __name__ == "__main__":
