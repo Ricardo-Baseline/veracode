@@ -5,7 +5,7 @@ veracode_static_scan:
     # Entering both will only execute branches_to_run
     # Leaving them both blank means this will never run
     branches_to_run:
-      - '*'
+      - default_branch
     branches_to_exclude:
   pull_request:
     trigger: true
@@ -23,7 +23,7 @@ veracode_static_scan:
   # If break_build_invalid_policy is set to true, the build will break when the policy name is invalid.
   break_build_invalid_policy: true
   # If the break_build_on_error is set to true, the build will break if the scan failed to complete in time or with an error and the error_message will be displayed.
-  break_build_on_error: false
+  break_build_on_error: true
   error_message: "Veracode static scan faced a problem. Please contact your Veracode administrator for more information."
   # Default policy to be used if a policy isn't already assigned to the application profile.
   policy: 'Veracode Recommended Medium + SCA'
@@ -40,12 +40,12 @@ veracode_static_scan:
 
 veracode_sca_scan:
   push:
-    trigger: false
+    trigger: true
     # Please only specify either branches_to_run or branches_to_exclude
     # Entering both will only execute branches_to_run
     # Leaving them both blank means this will never run
     branches_to_run:
-      - '*'
+      - default_branch
     branches_to_exclude:
   pull_request:
     trigger: true
@@ -68,12 +68,12 @@ veracode_sca_scan:
 
 veracode_iac_secrets_scan:
   push:
-    trigger: false
+    trigger: true
     # Please only specify either branches_to_run or branches_to_exclude
     # Entering both will only execute branches_to_run
     # Leaving them both blank means this will never run
     branches_to_run:
-      - '*'
+      - default_branch
     branches_to_exclude:
   pull_request:
     trigger: true
